@@ -7,5 +7,6 @@ pyinstaller==6.7.0
 pyinstaller-hooks-contrib==2024.6
 pytest==8.2.1
 pytest-mock==3.14.0
+rcon==2.4.6
 style==1.1.0
 tomli==2.0.1
