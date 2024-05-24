@@ -1,3 +1,5 @@
+# whitelist.py
+
 """
 
 argparse => Used for parsing command line arguments.
@@ -7,6 +9,7 @@ sqlite3 => Used for interacting with the database.
 json => Used for interacting with a JSON.
 time => Used for heartbeart function.
 os => Used for paths and directories.
+sys => Used for stopping the application. 
 datetime => Used to generate date and time for logging.
 threading => Used to create threads per player checks.
 logging / logging.handlers => Used for handling the logging functionality.
@@ -20,13 +23,14 @@ import sqlite3
 import json
 import time
 import os
+import sys
 import datetime
 import threading
 import logging
 import logging.handlers
 
 
-def setup_logging(log_directory) -> None:
+def setup_logging(log_directory: str) -> None:
     """
     Initiates the log for the whitelist.
     """
@@ -46,16 +50,16 @@ def setup_logging(log_directory) -> None:
     logging.basicConfig(level=logging.INFO, handlers=[file_handler, console_handler])
 
 
-def heartbeat() -> None:
+def heartbeat(count: int) -> None:
     """
     Initiates the heartbeat for application whilst it is running.
     """
     while True:
         logging.info("Whitelist is running...")
-        time.sleep(15)
+        time.sleep(count)
 
 
-def find_latest_log_dir(base_log_dir) -> str or None:
+def find_latest_log_dir(base_log_dir: str) -> str or None:
     """
     Used to find the latest game server log directory.
     """
@@ -75,7 +79,7 @@ def find_latest_log_dir(base_log_dir) -> str or None:
     return os.path.join(base_log_dir, latest_log_dir, "console.log")
 
 
-def is_player_in_database(player_name, identity_id, db_path) -> bool:
+def is_player_in_database(player_name: str, identity_id: str, db_path: str) -> bool:
     """
     Checks if the player's identifier is in the database.
     """
@@ -111,7 +115,7 @@ def is_player_in_database(player_name, identity_id, db_path) -> bool:
         return False
 
 
-def is_player_in_json(player_name, identity_id, json_path) -> bool:
+def is_player_in_json(player_name: str, identity_id: str, json_path: str) -> bool:
     """
     Checks if the player's identifier is in the JSON.
     """
@@ -141,9 +145,11 @@ def is_player_in_json(player_name, identity_id, json_path) -> bool:
         return False
 
 
-def execute_kick_command(player_id, rcon_host, rcon_port, rcon_password) -> None:
+def execute_kick_command(
+    player_id: str, rcon_host: str, rcon_port: int, rcon_password: str
+) -> None:
     """
-    IF player is not whitelisted, 
+    IF player is not whitelisted,
     this initiates the RCON application to remove the player from the server.
     """
 
@@ -179,7 +185,7 @@ def execute_kick_command(player_id, rcon_host, rcon_port, rcon_password) -> None
     kick_thread.start()
 
 
-def tail_log_file(file_path, callback) -> None:
+def tail_log_file(file_path: str, callback: object) -> None:
     """
     This functions grabs the last line of the log.
     """
@@ -200,7 +206,12 @@ def tail_log_file(file_path, callback) -> None:
 
 
 def process_log_line(
-    line, whitelist_type, whitelist_path, rcon_host, rcon_port, rcon_password
+    line: str,
+    whitelist_type: str,
+    whitelist_path: str,
+    rcon_host: str,
+    rcon_port: int,
+    rcon_password: str,
 ) -> None:
     """
     Processes and checks the line of the log, passes it for checks if it is a player join event.
@@ -247,7 +258,7 @@ def process_log_line(
         logging.debug("Unmatched line: %s", line)
 
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(
         prog="Reforger Whitelist",
         description="Whitelist script to monitor logs and kick unwhitelisted players.",
@@ -286,12 +297,46 @@ if __name__ == "__main__":
     parser.add_argument(
         "--rcon-password", type=str, required=True, help="RCON password."
     )
+    parser.add_argument(
+        "--heartbeat",
+        type=int,
+        default=15,
+    )
 
     args = parser.parse_args()
 
+    confirm_args = input(
+        """
+    Log Directory: %s\n
+    Whitelist Type: %s\n
+    Whitelist Path: %s\n
+    Base Game Log Directory: %s\n
+    RCON Host: %s\n
+    RCON Port: %s\n
+    RCON Password: %s\n
+    Heartbeat Count (secs): %s\n
+    Correct? [Y/n]: 
+    """.format(
+            args.log_directory,
+            args.whitelist_type,
+            args.whitelist_path,
+            args.base_log_dir,
+            args.rcon_host,
+            args.rcon_port,
+            args.rcon_password,
+            args.heartbeat,
+        )
+    )
+
+    if not confirm_args.lower() == "y" or "yes":
+        print("Please restart the application to try again.")
+        return
+
     setup_logging(args.log_directory)
 
-    heartbeat_thread = threading.Thread(target=heartbeat, name="HeartbeatThread")
+    heartbeat_thread = threading.Thread(
+        target=heartbeat(args.heartbeat), name="HeartbeatThread"
+    )
     heartbeat_thread.daemon = True
     heartbeat_thread.start()
 
@@ -316,3 +361,7 @@ if __name__ == "__main__":
         logging.info("Script interrupted by user.")
     except Exception as e:
         logging.exception("Unexpected error occurred in main process: %s", e)
+
+
+if __name__ == "__main__":
+    main()
