@@ -264,41 +264,50 @@ def main():
         description="Whitelist script to monitor logs and kick unwhitelisted players.",
     )
     parser.add_argument(
-        "--log-directory",
+        "--ld", "--log-directory",
         type=str,
         default="logs",
         help="Directory to store log files.",
     )
     parser.add_argument(
-        "--whitelist-type",
+        "--wt", "--whitelist-type",
         type=str,
         choices=["database", "json"],
         required=True,
         help="Type of whitelist to use (database or json).",
     )
     parser.add_argument(
-        "--whitelist-path",
+        "--wp", "--whitelist-path",
         type=str,
         required=True,
         help="Path to the whitelist file (database or JSON).",
     )
     parser.add_argument(
-        "--base-log-dir",
+        "--bl", "--base-log-dir",
         type=str,
         required=True,
         help="Base directory to look for log files.",
     )
     parser.add_argument(
-        "--rcon-host", type=str, required=True, help="RCON host address."
+        "--rh", "--rcon-host", 
+        type=str, 
+        required=True, 
+        help="RCON host address."
     )
     parser.add_argument(
-        "--rcon-port", type=int, required=True, help="RCON port number."
+        "--rp", "--rcon-port", 
+        type=int, 
+        required=True, 
+        help="RCON port number."
     )
     parser.add_argument(
-        "--rcon-password", type=str, required=True, help="RCON password."
+        "--rpw", "--rcon-password", 
+        type=str, 
+        required=True, 
+        help="RCON password."
     )
     parser.add_argument(
-        "--heartbeat",
+        "--hb", "--heartbeat",
         type=int,
         default=15,
     )
