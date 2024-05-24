@@ -181,7 +181,7 @@ def execute_kick_command(
     kick_thread.start()
 
 
-def tail_log_file(file_path: str, callback: object) -> None:
+def tail_log_file(file_path: str, callback: callable) -> None:
     """
     This functions grabs the last line of the log.
     """
