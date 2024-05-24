@@ -13,6 +13,7 @@ sys => Used for stopping the application.
 datetime => Used to generate date and time for logging.
 threading => Used to create threads per player checks.
 logging / logging.handlers => Used for handling the logging functionality.
+rcon.battleye => Used for executing kick commands on the server.
 
 """
 
@@ -28,6 +29,8 @@ import datetime
 import threading
 import logging
 import logging.handlers
+
+from rcon.battleye import Client
 
 
 def setup_logging(log_directory: str) -> None:
@@ -98,20 +101,22 @@ def is_player_in_database(player_name: str, identity_id: str, db_path: str) -> b
             is_whitelisted = cur.fetchone()
             if is_whitelisted is not None:
                 logging.info(
-                    "Player %s or IdentityId %s found in database and is whitelisted.",
-                    player_name,
-                    identity_id,
+                    "Player %s or IdentityId %s found in database and is whitelisted." % (
+                        player_name,
+                        identity_id,
+                    )
                 )
                 return True
             else:
                 logging.info(
-                    "Player %s or IdentityId %s not found in database or not whitelisted.",
-                    player_name,
-                    identity_id,
+                    "Player %s or IdentityId %s not found in database or not whitelisted." % (
+                        player_name,
+                        identity_id,
+                    )
                 )
                 return False
     except sqlite3.Error as database_error:
-        logging.error("Database error: %s", database_error)
+        logging.error("Database error: %s" % database_error)
         return False
 
 
@@ -129,19 +134,21 @@ def is_player_in_json(player_name: str, identity_id: str, json_path: str) -> boo
                 ):
                     if player.get("whitelisted", 0) == 1:
                         logging.info(
-                            "Player %s or IdentityId %s found in JSON and is whitelisted.",
-                            player_name,
-                            identity_id,
+                            "Player %s or IdentityId %s found in JSON and is whitelisted." % (
+                                player_name,
+                                identity_id,
+                            )
                         )
                         return True
             logging.info(
-                "Player %s or IdentityId %s not found in JSON or not whitelisted.",
-                player_name,
-                identity_id,
+                "Player %s or IdentityId %s not found in JSON or not whitelisted." % (
+                    player_name,
+                    identity_id,
+                )
             )
             return False
     except json.JSONDecodeError as json_error:
-        logging.error("JSON error: %s", json_error)
+        logging.error("JSON error: %s" % json_error)
         return False
 
 
@@ -152,34 +159,23 @@ def execute_kick_command(
     IF player is not whitelisted,
     this initiates the RCON application to remove the player from the server.
     """
-
     def kick_player():
-        command = [
-            "BERCon",
-            "-host",
-            rcon_host,
-            "-port",
-            rcon_port,
-            "-pw",
-            rcon_password,
-            "-cmd",
-            f"kick {player_id}",
-            "-cmd",
-            "exit",
-        ]
+        command = "#kick %s" % player_id
+        
         try:
-            subprocess.run(command, check=True)
+            with Client(host=rcon_host, port=rcon_port, passwd=rcon_password) as client:
+                rsp = client.run(command=command)
+                client.close()
             logging.info(
-                "Successfully executed kick command for player ID %s", player_id
+                "Successfully executed kick command for player ID %s" % player_id
             )
-        except subprocess.CalledProcessError as kick_error:
+        except Exception as e:
             logging.error(
-                "Error executing kick command for player ID %s: %s",
-                player_id,
-                kick_error,
+                "Unexpected error executing kick command for player ID %s: %s" % (
+                    player_id,
+                    e
+                )
             )
-        except Exception:
-            logging.exception("Unexpected error when kicking player ID %s", player_id)
 
     kick_thread = threading.Thread(target=kick_player, name=f"KickThread-{player_id}")
     kick_thread.start()
@@ -200,7 +196,7 @@ def tail_log_file(file_path: str, callback: object) -> None:
                 for line in chunk.splitlines():
                     callback(line)
     except FileNotFoundError:
-        logging.error("Log file not found: %s", file_path)
+        logging.error("Log file not found: %s" % file_path)
     except Exception:
         logging.exception("Error reading log file")
 
@@ -224,11 +220,12 @@ def process_log_line(
         action, player_id, player_name, identity_id = match.groups()
         player_name = player_name.strip()
         logging.info(
-            "%s Player - ID: %s, Name: %s, IdentityId: %s",
-            action,
-            player_id,
-            player_name,
-            identity_id,
+            "%s Player - ID: %s, Name: %s, IdentityId: %s" % (
+                action,
+                player_id,
+                player_name,
+                identity_id,
+            )
         )
 
         if whitelist_type == "database":
@@ -238,24 +235,26 @@ def process_log_line(
         elif whitelist_type == "json":
             is_whitelisted = is_player_in_json(player_name, identity_id, whitelist_path)
         else:
-            logging.error("Unknown whitelist type: %s", whitelist_type)
+            logging.error("Unknown whitelist type: %s" % whitelist_type)
             return
 
         if not is_whitelisted:
             logging.warning(
-                "Player: %s with IdentityId: %s is NOT whitelisted! Kicking...",
-                player_name,
-                identity_id,
+                "Player: %s with IdentityId: %s is NOT whitelisted! Kicking..." % (
+                    player_name,
+                    identity_id,
+                )
             )
             execute_kick_command(player_id, rcon_host, rcon_port, rcon_password)
         else:
             logging.info(
-                "Player: %s with IdentityId: %s is whitelisted!",
-                player_name,
-                identity_id,
+                "Player: %s with IdentityId: %s is whitelisted!" % (
+                    player_name,
+                    identity_id,
+                )
             )
     else:
-        logging.debug("Unmatched line: %s", line)
+        logging.debug("Unmatched line: %s" % line)
 
 
 def main():
@@ -333,7 +332,7 @@ def main():
     RCON Password: %s\n
     Heartbeat Count (secs): %s\n
     Correct? [Y/n]: 
-    """.format(
+    """ % (
             args.log_directory,
             args.whitelist_type,
             args.whitelist_path,
@@ -377,7 +376,7 @@ def main():
     except KeyboardInterrupt:
         logging.info("Script interrupted by user.")
     except Exception as e:
-        logging.exception("Unexpected error occurred in main process: %s", e)
+        logging.exception("Unexpected error occurred in main process: %s" % e)
 
 
 if __name__ == "__main__":
