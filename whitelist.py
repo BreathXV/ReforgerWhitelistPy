@@ -268,6 +268,7 @@ def main():
         type=str,
         default="logs",
         help="Directory to store log files.",
+        dest="log_directory",
     )
     parser.add_argument(
         "--wt", "--whitelist-type",
@@ -275,41 +276,48 @@ def main():
         choices=["database", "json"],
         required=True,
         help="Type of whitelist to use (database or json).",
+        dest="whitelist_type",
     )
     parser.add_argument(
         "--wp", "--whitelist-path",
         type=str,
         required=True,
         help="Path to the whitelist file (database or JSON).",
+        dest="whitelist_path",
     )
     parser.add_argument(
         "--bl", "--base-log-dir",
         type=str,
         required=True,
         help="Base directory to look for log files.",
+        dest="base_log_dir",
     )
     parser.add_argument(
         "--rh", "--rcon-host", 
         type=str, 
         required=True, 
-        help="RCON host address."
+        help="RCON host address.",
+        dest="rcon_host",
     )
     parser.add_argument(
         "--rp", "--rcon-port", 
         type=int, 
         required=True, 
-        help="RCON port number."
+        help="RCON port number.",
+        dest="rcon_port",
     )
     parser.add_argument(
         "--rpw", "--rcon-password", 
         type=str, 
         required=True, 
-        help="RCON password."
+        help="RCON password.",
+        dest="rcon_password",
     )
     parser.add_argument(
         "--hb", "--heartbeat",
         type=int,
         default=15,
+        dest="heartbeat",
     )
 
     args = parser.parse_args()
