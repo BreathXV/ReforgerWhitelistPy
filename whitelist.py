@@ -316,6 +316,7 @@ def main():
         "--hb", "--heartbeat",
         type=int,
         default=15,
+        help="Interval in seconds when the application should log it's alive.",
         dest="heartbeat",
     )
 
