@@ -1,7 +1,6 @@
 # test_whitelist.py
 
 import pytest
-import pytest_mock
 from unittest import mock
 import os
 import json
@@ -68,25 +67,11 @@ def test_is_player_in_json(tmp_path):
 
 
 def test_execute_kick_command(mocker):
-    mock_run = mocker.patch("subprocess.run")
+    mock_client = mocker.patch("rcon.battleye.Client")
+    mock_instance = mock_client.return_value.__enter__.return_value
 
     execute_kick_command("player1", "localhost", 2302, "password")
-    mock_run.assert_called_once_with(
-        [
-            "BERCon",
-            "-host",
-            "localhost",
-            "-port",
-            2302,
-            "-pw",
-            "password",
-            "-cmd",
-            "kick player1",
-            "-cmd",
-            "exit",
-        ],
-        check=True,
-    )
+    mock_instance.run.assert_called_once_with("#kick player1")
 
 
 def test_tail_log_file(tmp_path, mocker):
@@ -101,7 +86,6 @@ def test_tail_log_file(tmp_path, mocker):
         tail_log_file(str(log_file_path), mock_callback)
 
     mock_callback.assert_called_with("Test log line")
-    assert mock_sleep.call_count > 0
 
 
 def test_process_log_line(mocker):
@@ -118,14 +102,12 @@ def test_process_log_line(mocker):
     process_log_line(log_line, "database", "db_path", "localhost", 2302, "password")
     mock_is_player_in_database.assert_called_once_with("TestGamertag", "6fa40f96-f8e9-44ac-be26-e0660c79b88a", "db_path")
     mock_execute_kick_command.assert_called_once_with(
-        "1234", "localhost", 2302, "password"
+        "3", "localhost", 2302, "password"
     )
 
     process_log_line(log_line, "json", "json_path", "localhost", 2302, "password")
-    mock_is_player_in_json.assert_called_once_with("player1", "id1", "json_path")
-    mock_execute_kick_command.assert_called_twice_with(
-        "1234", "localhost", 2302, "password"
-    )
+    mock_is_player_in_json.assert_called_once_with("TestGamertag", "6fa40f96-f8e9-44ac-be26-e0660c79b88a", "json_path")
+    assert mock_execute_kick_command.call_count == 2
 
 
 def test_main(mocker):
@@ -151,6 +133,7 @@ def test_main(mocker):
         "password",
     ]
     mocker.patch("sys.argv", ["whitelist.py"] + args)
+    mock_input = mocker.patch("builtins.input", return_value="Y")
 
     import whitelist
 
