@@ -156,10 +156,12 @@ def execute_kick_command(
     player_id: str, rcon_host: str, rcon_port: int, rcon_password: str
 ) -> None:
     """
-    IF player is not whitelisted,
-    this initiates the RCON application to remove the player from the server.
+    Initiates the kick_thread IF a player is not whitelisted.
     """
     def kick_player():
+        """
+        Establishes a connection with BERCon and executes the kick command.
+        """
         command = "#kick %s" % player_id
         
         try:
