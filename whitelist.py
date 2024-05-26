@@ -365,15 +365,18 @@ def main() -> None:
             with open(file=args.config, mode="r", encoding="utf-8") as file:
                 config = json.load(file)
                 logging.info("Loaded configuration file")
+                # Check for all params in the config
                 for param in config.get(param, ""):
                     if not param:
                         logging.error(
                             "A parameter is missing in the configuration file!"
                         )
                         return
+                # Assign each args value to the dict
                 for param in app_args.keys():
                     app_args[param] == config.get(param, "")
-                # TODO: Invoke initiate func w/h dict using "initiate(**app_args)"
+                # Invoke func with param values from dict
+                initiate(**app_args)
         except FileNotFoundError:
             logging.error(
                 "Configuration file could not be found at path: %s" % args.config
