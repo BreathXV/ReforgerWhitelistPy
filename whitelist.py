@@ -360,31 +360,33 @@ def main() -> None:
         "heartbeat": "",
     }
 
+    # TODO: Invoke setup_logging() before args.config
+    # NOTE: Needed for logging the progress of assigning param values in the dict! 
+    # Crucial if using config.
+
     if args.config:
         try:
             with open(file=args.config, mode="r", encoding="utf-8") as file:
                 config = json.load(file)
-                logging.info("Loaded configuration file")
+                # logging.info("Loaded configuration file")
                 # Check for all params in the config
                 for param in config.get(param, ""):
                     if not param:
-                        logging.error(
-                            "A parameter is missing in the configuration file!"
-                        )
+                        # logging.error("A parameter is missing in the configuration file!")
                         return
                 # Assign each args value to the dict
+                # logging.info("Assigning all config values...")
                 for param in app_args.keys():
+                    # logging.info(f"Loaded {param}")
                     app_args[param] == config.get(param, "")
                 # Invoke func with param values from dict
                 initiate(**app_args)
         except FileNotFoundError:
-            logging.error(
-                "Configuration file could not be found at path: %s" % args.config
-            )
+            # logging.error("Configuration file could not be found at path: %s" % args.config)
+            print("Configuration file could not be found at path: %s" % args.config)
         except json.JSONDecodeError:
-            logging.error(
-                "Error decoding the configuration file, ensure you are using 'utf-8' encoding."
-            )
+            # logging.error("Error decoding the configuration file, ensure you are using 'utf-8' encoding.")
+            print("Error decoding the configuration file, ensure you are using 'utf-8' encoding.")
         return
     else:
         for arg in app_args:
