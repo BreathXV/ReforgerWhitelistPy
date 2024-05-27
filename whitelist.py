@@ -345,7 +345,7 @@ def main():
         )
     )
 
-    if confirm_args.lower() in ('y', 'yes'):
+    if confirm_args.lower() in ('n', 'no'):
         print("Please restart the application to try again.")
         return
 
