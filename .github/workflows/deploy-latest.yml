@@ -1,4 +1,4 @@
-name: Deploy (Latest) Whitelist Application
+name: Build Latest
 
 on:
   push:
@@ -13,32 +13,38 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Set up Docker Build Environment
-        run: |
-          docker pull cdrx/pyinstaller-windows
+    - name: Set up Python 3.10.12
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.10.12'
 
-      - name: Build Windows executable
-        run: |
-          docker run --rm -v "$(pwd):/src/" cdrx/pyinstaller-windows /bin/bash -c "
-            apt-get update &&
-            apt-get install -y python3.10 python3.10-venv python3.10-dev &&
-            ln -sf /usr/bin/python3.10 /usr/bin/python &&
-            ln -sf /usr/bin/python3.10 /usr/bin/python3 &&
-            python -m pip install --upgrade pip &&
-            python -m pip install -r requirements.txt &&
-            pyinstaller --onefile whitelist.py
-          "
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
 
-      - name: List dist directory
-        run: |
-          ls -al dist
+    - name: Install Wine
+      run: |
+        sudo dpkg --add-architecture i386
+        sudo apt update
+        sudo apt install -y wine64 wine32
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: ReforgerWhitelist
-          path: dist/whitelist.exe
-          if-no-files-found: warn
+    - name: Install Docker
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y docker.io
+        sudo systemctl start docker
+        sudo systemctl enable docker
+
+    - name: Build executable
+      run: |
+        docker run --rm -v "$(pwd):/src/" cdrx/pyinstaller-windows "pyinstaller --onefile whitelist.py"
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: ReforgerWhitelist
+        path: dist/whitelist.exe
