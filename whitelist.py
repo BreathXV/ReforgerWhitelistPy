@@ -345,7 +345,7 @@ def main():
         )
     )
 
-    if not confirm_args.lower() == "y" or "yes":
+    if confirm_args.lower() != "y" or "yes":
         print("Please restart the application to try again.")
         return
 
