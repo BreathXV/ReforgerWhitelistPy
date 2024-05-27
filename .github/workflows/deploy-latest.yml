@@ -22,7 +22,7 @@ jobs:
 
       - name: Build Windows executable
         run: |
-          docker run --rm -v "$(pwd):/src/" cdrx/pyinstaller-windows "pyinstaller --onefile whitelist.py"
+          docker run --rm -v "$(pwd):/src/" cdrx/pyinstaller-windows /bin/bash -c "python3 -m pip install --upgrade pip && python3 -m pip install -r requirements.txt && pyinstaller --onefile whitelist.py"
 
       - name: List dist directory
         run: |
@@ -31,6 +31,6 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
-          name: my-python-app
+          name: ReforgerWhitelist
           path: dist/whitelist.exe
           if-no-files-found: warn
