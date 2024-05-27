@@ -47,6 +47,6 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
-          name: my-python-app
-          path: dist/whitelist.exe
+          name: Reforger Whitelist
+          path: dist/whitelist
           if-no-files-found: warn
