@@ -32,13 +32,20 @@ jobs:
           sudo apt update
           sudo apt install -y wine64 wine32
 
-      - name: Install PyInstaller
+      - name: Download Windows Python
         run: |
-          pip install pyinstaller
+          mkdir -p ~/.wine/drive_c/Python
+          cd ~/.wine/drive_c/Python
+          wget https://www.python.org/ftp/python/3.8.0/python-3.8.0.exe
+          wine python-3.8.0.exe /quiet InstallAllUsers=1 PrependPath=1
 
-      - name: Build executable
+      - name: Install PyInstaller for Windows
         run: |
-          pyinstaller --onefile whitelist.py
+          wine ~/.wine/drive_c/Python/python.exe -m pip install pyinstaller
+
+      - name: Build Windows executable
+        run: |
+          wine ~/.wine/drive_c/Python/python.exe -m PyInstaller --onefile whitelist.py
 
       - name: List dist directory
         run: |
@@ -47,6 +54,6 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
-          name: Reforger Whitelist
-          path: dist/whitelist
+          name: ReforgerWhitelist
+          path: dist/whitelist.exe
           if-no-files-found: warn
