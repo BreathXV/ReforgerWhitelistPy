@@ -32,11 +32,11 @@ jobs:
 
       - name: Build Windows executable
         run: |
-          pyinstaller --onefile whitelist.py
+          pyinstaller --name ReforgerWhitelist-Latest --onefile whitelist.py
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ReforgerWhitelist
-          path: dist/whitelist.exe
-          if-no-files-found: warn
+          path: dist/ReforgerWhitelist-Latest.exe
+          if-no-files-found: error
