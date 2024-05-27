@@ -62,7 +62,7 @@ def heartbeat(count: int) -> None:
         time.sleep(count)
 
 
-def find_latest_log_dir(base_log_dir: str) -> str or None:
+def find_latest_log_dir(base_log_dir: str) -> str | None:
     """
     Used to find the latest game server log directory.
     """
