@@ -38,5 +38,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ReforgerWhitelist
-          path: dist/whitelist.exe
-          if-no-files-found: warn
+          path: dist/ReforgerWhitelist.exe
+          if-no-files-found: error
