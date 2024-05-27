@@ -1,0 +1,47 @@
+name: Deploy (Latest) Whitelist Application
+
+on:
+  push:
+    branches:
+      - dev
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Install Wine
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt update
+          sudo apt install -y wine64 wine32
+
+      - name: Install PyInstaller
+        run: |
+          pip install pyinstaller
+
+      - name: Build executable
+        run: |
+          pyinstaller --onefile whitelist.py
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: my-python-app
+          path: dist/your_script.exe
