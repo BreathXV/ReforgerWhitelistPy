@@ -18,13 +18,11 @@ rcon.battleye => Used for executing kick commands on the server.
 """
 
 import argparse
-import subprocess
 import re
 import sqlite3
 import json
 import time
 import os
-import sys
 import datetime
 import threading
 import logging
@@ -62,7 +60,7 @@ def heartbeat(count: int) -> None:
         time.sleep(count)
 
 
-def find_latest_log_dir(base_log_dir: str) -> str or None:
+def find_latest_log_dir(base_log_dir: str) -> str:
     """
     Used to find the latest game server log directory.
     """
@@ -268,7 +266,7 @@ def main():
         "--ld", "--log-directory",
         type=str,
         default="logs",
-        help="Directory to store log files.",
+        help="Directory to store log files from ReforgerWhitelist.",
         dest="log_directory",
     )
     parser.add_argument(
@@ -290,7 +288,7 @@ def main():
         "--bl", "--base-log-dir",
         type=str,
         required=True,
-        help="Base directory to look for log files.",
+        help="Base directory to look for log files for whitelist.",
         dest="base_log_dir",
     )
     parser.add_argument(
