@@ -2,7 +2,7 @@ altgraph==0.17.4
 exceptiongroup==1.2.1
 iniconfig==2.0.0
 packaging==24.0
-pluggy==1.2.0
+pluggy==1.5.0
 pyinstaller==6.7.0
 pyinstaller-hooks-contrib==2024.6
 pytest==8.2.1
