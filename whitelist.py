@@ -275,7 +275,7 @@ def main() -> None:
         "--config",
         type=str,
         required=False,
-        help="Start from a .env",
+        help="Start from a config.json",
         dest="config",
     )
     parser.add_argument(
