@@ -7,7 +7,7 @@ subprocess => Used for executing RCON application.
 re => Used to check player identifiers using regex.
 sqlite3 => Used for interacting with the database.
 json => Used for interacting with a JSON.
-time => Used for heartbeart function.
+time => Used for heartbeat function.
 os => Used for paths and directories.
 sys => Used for stopping the application. 
 datetime => Used to generate date and time for logging.
@@ -268,7 +268,7 @@ def process_log_line(
 def main() -> None:
     parser = argparse.ArgumentParser(
         prog="Reforger Whitelist",
-        description="Whitelist script to monitor logs and kick unwhitelisted players.",
+        description="Whitelist script to monitor logs and kick non-whitelisted players.",
     )
     parser.add_argument(
         "--cfg",
@@ -390,7 +390,7 @@ def main() -> None:
         return
     else:
         for arg in app_args:
-            print(args.app_args[i])
+            print(args.app_args[arg])
 
     def initiate(
         log_directory: str = args.log_directory,

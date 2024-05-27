@@ -1,0 +1,12 @@
+{
+    "config": {
+        "log_directory": "",
+        "whitelist_type": "",
+        "whitelist_path": "",
+        "base_log_dir": "",
+        "rcon_host": "",
+        "rcon_port": "",
+        "rcon_password": "",
+        "heartbeat": ""
+    }
+}
