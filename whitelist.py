@@ -62,7 +62,7 @@ def heartbeat(count: int) -> None:
         count (int): Interval between messages.
     """    
     while True:
-        logging.info("Whitelist is running...")
+        logging.info("Whitelist is running... Use [Ctrl + C] to stop the application.")
         time.sleep(count)
 
 
