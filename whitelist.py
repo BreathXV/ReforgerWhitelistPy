@@ -383,10 +383,6 @@ def main() -> None:
         "heartbeat": "",
     }
 
-    # TODO: Invoke setup_logging() before args.config
-    # NOTE: Needed for logging the progress of assigning param values in the dict! 
-    # Crucial if using config.
-
     if args.config:
         try:
             with open(file=args.config, mode="r", encoding="utf-8") as file:

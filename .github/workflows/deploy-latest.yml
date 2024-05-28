@@ -37,6 +37,6 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ReforgerWhitelist
+          name: ReforgerWhitelistLatest
           path: dist/ReforgerWhitelist-Latest.exe
           if-no-files-found: error
