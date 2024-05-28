@@ -18,13 +18,11 @@ rcon.battleye => Used for executing kick commands on the server.
 """
 
 import argparse
-import subprocess
 import re
 import sqlite3
 import json
 import time
 import os
-import sys
 import datetime
 import threading
 import logging
