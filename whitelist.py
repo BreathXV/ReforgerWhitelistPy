@@ -3,16 +3,15 @@
 """
 
 argparse => Used for parsing command line arguments.
-subprocess => Used for executing RCON application.
 re => Used to check player identifiers using regex.
 sqlite3 => Used for interacting with the database.
 json => Used for interacting with a JSON.
 time => Used for heartbeat function.
 os => Used for paths and directories.
-sys => Used for stopping the application. 
 datetime => Used to generate date and time for logging.
 threading => Used to create threads per player checks.
 logging / logging.handlers => Used for handling the logging functionality.
+
 rcon.battleye => Used for executing kick commands on the server.
 
 """
