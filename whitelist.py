@@ -297,7 +297,11 @@ def process_log_line(
 def main() -> None:
     parser = argparse.ArgumentParser(
         prog="Reforger Whitelist",
-        description="Whitelist script to monitor logs and kick non-whitelisted players.",
+        description="""
+                    Whitelist script to monitor logs and kick non-whitelisted players.\n
+                    Reforger Whitelist is licensed under the GPL-3.0 License. This license can be found within the GitHub Repository.\n
+                    https://github.com/BreathXV/ReforgerWhitelistPy
+                    """,
     )
     parser.add_argument(
         "--cfg",
@@ -306,15 +310,6 @@ def main() -> None:
         required=False,
         help="Start from a config.json",
         dest="config",
-    )
-    parser.add_argument(
-        "--ld",
-        "--log-directory",
-        type=str,
-        required=False,
-        default="logs",
-        help="Directory to store log files.",
-        dest="log_directory",
     )
     parser.add_argument(
         "--wt",
@@ -379,7 +374,6 @@ def main() -> None:
 
     app_args = {
         "env": "",
-        "log_directory": "",
         "whitelist_type": "",
         "whitelist_path": "",
         "base_log_dir": "",
@@ -397,24 +391,24 @@ def main() -> None:
         try:
             with open(file=args.config, mode="r", encoding="utf-8") as file:
                 config = json.load(file)
-                # logging.info("Loaded configuration file")
+                logging.info("Loaded configuration file")
                 # Check for all params in the config
                 for param in config.get(param, ""):
                     if not param:
-                        # logging.error("A parameter is missing in the configuration file!")
+                        logging.error("A parameter is missing in the configuration file!")
                         return
                 # Assign each args value to the dict
-                # logging.info("Assigning all config values...")
+                logging.info("Assigning all config values...")
                 for param in app_args.keys():
-                    # logging.info(f"Loaded {param}")
+                    logging.info(f"Loaded {param}")
                     app_args[param] == config.get(param, "")
                 # Invoke func with param values from dict
                 initiate(**app_args)
         except FileNotFoundError:
-            # logging.error("Configuration file could not be found at path: %s" % args.config)
+            logging.error("Configuration file could not be found at path: %s" % args.config)
             print("Configuration file could not be found at path: %s" % args.config)
         except json.JSONDecodeError:
-            # logging.error("Error decoding the configuration file, ensure you are using 'utf-8' encoding.")
+            logging.error("Error decoding the configuration file, ensure you are using 'utf-8' encoding.")
             print("Error decoding the configuration file, ensure you are using 'utf-8' encoding.")
         return
     else:
@@ -422,7 +416,6 @@ def main() -> None:
             print(args.app_args[arg])
 
     def initiate(
-        log_directory: str = args.log_directory,
         whitelist_type: str = args.whitelist_type,
         whitelist_path: str = args.whitelist_path,
         base_log_dir: str = args.base_log_dir,
@@ -434,7 +427,6 @@ def main() -> None:
         """Initiates the application with the provided arguments.
 
         Args:
-            log_directory (str, optional): Directory to store log files. Defaults to args.log_directory.
             whitelist_type (str, optional): Type of whitelist to use (database or json). Defaults to args.whitelist_type.
             whitelist_path (str, optional): Path to the whitelist file (database or JSON). Defaults to args.whitelist_path.
             base_log_dir (str, optional): Base directory to look for log files. Defaults to args.base_log_dir.
@@ -442,8 +434,7 @@ def main() -> None:
             rcon_port (int, optional): RCON port. Defaults to args.rcon_port.
             rcon_password (str, optional): RCON password. Defaults to args.rcon_password.
             heartbeat (int, optional): Interval in seconds when the application should log it's alive. Defaults to args.heartbeat.
-        """        
-        setup_logging(log_directory)
+        """
 
         heartbeat_thread = threading.Thread(
             target=heartbeat(heartbeat), name="HeartbeatThread"
@@ -475,4 +466,5 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    setup_logging("./whitelist/")
     main()
