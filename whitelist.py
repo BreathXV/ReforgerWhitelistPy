@@ -446,15 +446,15 @@ def main() -> None:
             rcon_password (str, optional): RCON password. Defaults to args.rcon_password.
             heartbeat (int, optional): Interval in seconds when the application should log it's alive. Defaults to args.heartbeat.
         """        
-        setup_logging(args.log_directory)
+        setup_logging(log_directory)
 
         heartbeat_thread = threading.Thread(
-            target=heartbeat(args.heartbeat), name="HeartbeatThread"
+            target=heartbeat(heartbeat), name="HeartbeatThread"
         )
         heartbeat_thread.daemon = True
         heartbeat_thread.start()
 
-        latest_console_log_path = find_latest_log_dir(args.base_log_dir)
+        latest_console_log_path = find_latest_log_dir(base_log_dir)
 
         try:
             if latest_console_log_path:
@@ -462,11 +462,11 @@ def main() -> None:
                     latest_console_log_path,
                     lambda line: process_log_line(
                         line,
-                        args.whitelist_type,
-                        args.whitelist_path,
-                        args.rcon_host,
-                        args.rcon_port,
-                        args.rcon_password,
+                        whitelist_type,
+                        whitelist_path,
+                        rcon_host,
+                        rcon_port,
+                        rcon_password,
                     ),
                 )
             else:
