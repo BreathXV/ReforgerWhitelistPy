@@ -1,5 +1,7 @@
 # whitelist.py
 
+# ! DO NOT PUSH - NOT TESTED YET!
+
 """
 
 argparse => Used for parsing command line arguments.
@@ -28,6 +30,64 @@ import logging
 import logging.handlers
 
 from rcon.battleye import Client
+
+
+class Config:
+    def __init__(
+        self,
+        config_path: str,
+    ) -> bool:
+        self.config_path = config_path,
+        self.whitelist_type = None,
+        self.whitelist_path = None,
+        self.base_log_dir = None,
+        self.rcon_host = None,
+        self.rcon_port = None,
+        self.rcon_password = None,
+        self.heartbeat = None,
+        self.param_dict = {
+            "env": "",
+            "whitelist_type": "",
+            "whitelist_path": "",
+            "base_log_dir": "",
+            "rcon_host": "",
+            "rcon_port": "",
+            "rcon_password": "",
+            "heartbeat": "",
+        },
+        
+    def check_config(self) -> bool:
+        """Checks the config file to ensure it befits the applications needs.
+        """
+        try:
+            with open(file=self.config_path, mode="r", encoding="utf-8") as file:
+                config = json.load(file)
+                logging.info("Loaded configuration file")
+                # Check for all params in the config
+                for param in config.get(str(self.param_dict.keys()), ""):
+                    if not param:
+                        logging.error("A parameter is missing in the configuration file!")
+                        return
+                    else:
+                        logging.info(f"All parameters are present within {self.config_path}")
+                        return True
+        except FileNotFoundError:
+            logging.error(f"Configuration file could not be found at {self.config_path}")
+        except json.JSONDecodeError:
+            logging.error(f"File was found but could not decode it - make sure it has 'utf-8' encoding.")
+    
+    def get_config_value(self) -> bool:
+        """Retrieves all values from the config file.
+        """        
+        with open(file=self.config_path, mode="r", encoding="utf-8") as file:
+            config = json.load(file)
+            # Assign each args value to the dict
+            logging.info("Assigning all config values...")
+            for param in self.param_dict.keys():
+                logging.info(f"Loaded {param}")
+                self.param_dict[param] == config.get(param, "")
+                logging.info(f"{param}: {self.param_dict[param]}")
+            return True
 
 
 def setup_logging(log_directory: str) -> None:
@@ -292,6 +352,56 @@ def process_log_line(
             )
     else:
         logging.debug("Unmatched line: %s" % line)
+        
+
+def initiate(
+    whitelist_type: str,
+    whitelist_path: str,
+    base_log_dir: str,
+    rcon_host: str,
+    rcon_port: int,
+    rcon_password: str,
+    heartbeat: int,
+) -> None:
+    """Initiates the application with the provided arguments.
+
+    Args:
+        whitelist_type (str, optional): Type of whitelist to use (database or json). Defaults to args.whitelist_type.
+        whitelist_path (str, optional): Path to the whitelist file (database or JSON). Defaults to args.whitelist_path.
+        base_log_dir (str, optional): Base directory to look for log files. Defaults to args.base_log_dir.
+        rcon_host (str, optional): RCON host address. Defaults to args.rcon_host.
+        rcon_port (int, optional): RCON port. Defaults to args.rcon_port.
+        rcon_password (str, optional): RCON password. Defaults to args.rcon_password.
+        heartbeat (int, optional): Interval in seconds when the application should log it's alive. Defaults to args.heartbeat.
+    """
+
+    heartbeat_thread = threading.Thread(
+        target=heartbeat(heartbeat), name="HeartbeatThread"
+    )
+    heartbeat_thread.daemon = True
+    heartbeat_thread.start()
+
+    latest_console_log_path = find_latest_log_dir(base_log_dir)
+
+    try:
+        if latest_console_log_path:
+            tail_log_file(
+                latest_console_log_path,
+                lambda line: process_log_line(
+                    line,
+                    whitelist_type,
+                    whitelist_path,
+                    rcon_host,
+                    rcon_port,
+                    rcon_password,
+                ),
+            )
+        else:
+            logging.error("No recent log file found to process.")
+    except KeyboardInterrupt:
+        logging.info("Script interrupted by user.")
+    except Exception as e:
+        logging.exception("Unexpected error occurred in main process: %s" % e)
 
 
 def main() -> None:
@@ -311,14 +421,29 @@ def main() -> None:
         help="Start from a config.json",
         dest="config",
     )
+    # parser.add_argument(
+    #     "--wt",
+    #     "--whitelist-type",
+    #     type=str,
+    #     required=False,
+    #     choices=["database", "json"],
+    #     help="Type of whitelist to use (database or json).",
+    #     dest="whitelist_type",
+    # )
     parser.add_argument(
-        "--wt",
-        "--whitelist-type",
-        type=str,
+        "--json",
+        action="store_true",
         required=False,
-        choices=["database", "json"],
-        help="Type of whitelist to use (database or json).",
-        dest="whitelist_type",
+        help="Use JSON for whitelist queries.",
+        dest="json",
+    )
+    parser.add_argument(
+        "--db",
+        "--database",
+        action="store_true",
+        required=False,
+        help="Use a database for whitelist queries.",
+        dest="db",
     )
     parser.add_argument(
         "--wp",
@@ -372,93 +497,12 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    app_args = {
-        "env": "",
-        "whitelist_type": "",
-        "whitelist_path": "",
-        "base_log_dir": "",
-        "rcon_host": "",
-        "rcon_port": "",
-        "rcon_password": "",
-        "heartbeat": "",
-    }
-
     if args.config:
-        try:
-            with open(file=args.config, mode="r", encoding="utf-8") as file:
-                config = json.load(file)
-                logging.info("Loaded configuration file")
-                # Check for all params in the config
-                for param in config.get(param, ""):
-                    if not param:
-                        logging.error("A parameter is missing in the configuration file!")
-                        return
-                # Assign each args value to the dict
-                logging.info("Assigning all config values...")
-                for param in app_args.keys():
-                    logging.info(f"Loaded {param}")
-                    app_args[param] == config.get(param, "")
-                # Invoke func with param values from dict
-                initiate(**app_args)
-        except FileNotFoundError:
-            logging.error("Configuration file could not be found at path: %s" % args.config)
-            print("Configuration file could not be found at path: %s" % args.config)
-        except json.JSONDecodeError:
-            logging.error("Error decoding the configuration file, ensure you are using 'utf-8' encoding.")
-            print("Error decoding the configuration file, ensure you are using 'utf-8' encoding.")
-        return
+        Config()
     else:
         for arg in app_args:
-            print(args.app_args[arg])
-
-    def initiate(
-        whitelist_type: str = args.whitelist_type,
-        whitelist_path: str = args.whitelist_path,
-        base_log_dir: str = args.base_log_dir,
-        rcon_host: str = args.rcon_host,
-        rcon_port: int = args.rcon_port,
-        rcon_password: str = args.rcon_password,
-        heartbeat: int = args.heartbeat,
-    ) -> None:
-        """Initiates the application with the provided arguments.
-
-        Args:
-            whitelist_type (str, optional): Type of whitelist to use (database or json). Defaults to args.whitelist_type.
-            whitelist_path (str, optional): Path to the whitelist file (database or JSON). Defaults to args.whitelist_path.
-            base_log_dir (str, optional): Base directory to look for log files. Defaults to args.base_log_dir.
-            rcon_host (str, optional): RCON host address. Defaults to args.rcon_host.
-            rcon_port (int, optional): RCON port. Defaults to args.rcon_port.
-            rcon_password (str, optional): RCON password. Defaults to args.rcon_password.
-            heartbeat (int, optional): Interval in seconds when the application should log it's alive. Defaults to args.heartbeat.
-        """
-
-        heartbeat_thread = threading.Thread(
-            target=heartbeat(heartbeat), name="HeartbeatThread"
-        )
-        heartbeat_thread.daemon = True
-        heartbeat_thread.start()
-
-        latest_console_log_path = find_latest_log_dir(base_log_dir)
-
-        try:
-            if latest_console_log_path:
-                tail_log_file(
-                    latest_console_log_path,
-                    lambda line: process_log_line(
-                        line,
-                        whitelist_type,
-                        whitelist_path,
-                        rcon_host,
-                        rcon_port,
-                        rcon_password,
-                    ),
-                )
-            else:
-                logging.error("No recent log file found to process.")
-        except KeyboardInterrupt:
-            logging.info("Script interrupted by user.")
-        except Exception as e:
-            logging.exception("Unexpected error occurred in main process: %s" % e)
+            print(app_args[arg])
+            initiate(**app_args.values())
 
 
 if __name__ == "__main__":
