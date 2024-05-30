@@ -1,6 +1,7 @@
 # whitelist.py
 
 # ! DO NOT PUSH - NOT TESTED YET!
+# TODO: Separate funcs into separate components.
 
 """
 
@@ -328,7 +329,9 @@ def process_log_line(
                 player_name, identity_id, whitelist_path
             )
         elif whitelist_type == "json":
-            is_whitelisted = is_player_in_json(player_name, identity_id, whitelist_path)
+            is_whitelisted = is_player_in_json(
+                player_name, identity_id, whitelist_path
+            )
         else:
             logging.error("Unknown whitelist type: %s" % whitelist_type)
             return
@@ -496,13 +499,26 @@ def main() -> None:
     )
 
     args = parser.parse_args()
+    
+    if args.json:
+        whitelist_type = "json"
+    elif args.db:
+        whitelist_type = "db"
 
     if args.config:
+        logging.info("Configuration argument provided...")
         Config()
     else:
-        for arg in app_args:
-            print(app_args[arg])
-            initiate(**app_args.values())
+        logging.info("Using provided arguments...")
+        initiate(
+            whitelist_type=whitelist_type,
+            whitelist_path=args.whitelist_path,
+            base_log_dir=args.base_log_dir,
+            rcon_host=args.rcon_host,
+            rcon_port=args.rcon_port,
+            rcon_password=args.rcon_password,
+            heartbeat=args.heartbeat
+        )
 
 
 if __name__ == "__main__":
