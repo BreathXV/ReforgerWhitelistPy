@@ -32,7 +32,7 @@ jobs:
 
       - name: Build Windows executable
         run: |
-          pyinstaller --name ReforgerWhitelist-Latest --onefile whitelist.py
+          pyinstaller --name ReforgerWhitelist-Latest --onefile main.py
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
