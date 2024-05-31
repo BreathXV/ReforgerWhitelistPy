@@ -4,6 +4,8 @@ import os
 import datetime
 import logging
 
+from components.check_player import is_player_in_json, is_player_in_database
+
 logger = logging.getLogger(__name__)
 
 def tail_log_file(file_path: str, callback: callable) -> None:
