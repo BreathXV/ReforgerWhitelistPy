@@ -5,6 +5,7 @@ import datetime
 import logging
 
 from components.check_player import is_player_in_json, is_player_in_database
+from components.kick_player import execute_kick_command
 
 logger = logging.getLogger(__name__)
 
