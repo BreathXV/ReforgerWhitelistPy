@@ -6,7 +6,7 @@ import os
 import json
 import sqlite3
 import re
-from whitelist import (
+from main import (
     setup_logging,
     heartbeat,
     find_latest_log_dir,
@@ -135,9 +135,9 @@ def test_main(mocker):
     mocker.patch("sys.argv", ["whitelist.py"] + args)
     mock_input = mocker.patch("builtins.input", return_value="Y")
 
-    import whitelist
+    import main
 
-    whitelist.main()
+    main.main()
 
     mock_setup_logging.assert_called_once()
     mock_find_latest_log_dir.assert_called_once_with("base_log_dir")
