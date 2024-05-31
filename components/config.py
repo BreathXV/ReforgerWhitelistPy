@@ -1,5 +1,7 @@
 import json
-import loggi
+import logging
+
+logger = logging.getLogger(__name__)
 
 class Config:
     """A class to represent the configuration file and its values.
@@ -69,19 +71,19 @@ class Config:
         try:
             with open(file=self.config_path, mode="r", encoding="utf-8") as file:
                 config = json.load(file)
-                logging.info("Loaded configuration file")
+                logger.info("Loaded configuration file")
                 # Check for all params in the config
                 for param in config.get(str(self.param_dict.keys()), ""):
                     if not param:
-                        logging.error("A parameter is missing in the configuration file!")
+                        logger.error("A parameter is missing in the configuration file!")
                         return False
                     else:
-                        logging.info(f"All parameters are present within {self.config_path}")
+                        logger.info(f"All parameters are present within {self.config_path}")
                         return True
         except FileNotFoundError:
-            logging.error(f"Configuration file could not be found at {self.config_path}")
+            logger.error(f"Configuration file could not be found at {self.config_path}")
         except json.JSONDecodeError:
-            logging.error(f"File was found but could not decode it - make sure it has 'utf-8' encoding.")
+            logger.error(f"File was found but could not decode it - make sure it has 'utf-8' encoding.")
     
     def get_config_value(self) -> bool:
         """Retrieves all values from the config file.
@@ -96,9 +98,9 @@ class Config:
         with open(file=self.config_path, mode="r", encoding="utf-8") as file:
             config = json.load(file)
             # Assign each args value to the dict
-            logging.info("Assigning all config values...")
+            logger.info("Assigning all config values...")
             for param in self.param_dict.keys():
-                logging.info(f"Loaded {param}")
+                logger.info(f"Loaded {param}")
                 self.param_dict[param] == config.get(param, "")
-                logging.info(f"{param}: {self.param_dict[param]}")
+                logger.info(f"{param}: {self.param_dict[param]}")
             return True

@@ -1,6 +1,8 @@
 import logging, logging.handlers
 import os   # TODO: Change to pathlib
 
+logger = logging.getLogger(__name__)
+
 def setup_logging(log_directory: str) -> None:
     """Set up the logging for the application. Will also print to the CLI.
 
