@@ -89,6 +89,13 @@ class Config:
         
     def check_config(self) -> bool:
         """Checks the config file to ensure it befits the applications needs.
+
+        ...
+
+        Returns
+        ----------
+        bool
+            Whether the configuration file has all required parameters or not.
         """
         try:
             with open(file=self.config_path, mode="r", encoding="utf-8") as file:
@@ -109,6 +116,13 @@ class Config:
     
     def get_config_value(self) -> bool:
         """Retrieves all values from the config file.
+
+        ...
+
+        Returns
+        ----------
+        bool
+            Whether all of the configuration file's values where able to be assigned.
         """        
         with open(file=self.config_path, mode="r", encoding="utf-8") as file:
             config = json.load(file)
@@ -499,6 +513,8 @@ def initiate(
 
 
 def main() -> None:
+    """Used to invoke the initiate function. Parses any arguments provided by the user.
+    """    
     parser = argparse.ArgumentParser(
         prog="Reforger Whitelist",
         description="""
