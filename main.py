@@ -124,5 +124,5 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    setup_logging("./whitelist/")
+    setup_logging("./logs/")
     main()
