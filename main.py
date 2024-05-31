@@ -39,34 +39,9 @@ import logging
 from rcon.battleye import Client
 
 from components.logging import setup_logging
+from components.config import Config
 
 logger = logging.getLogger(__name__)
-
-
-def setup_logging(log_directory: str) -> None:
-    """Set up the logging for the application. Will also print to the CLI.
-
-    ...
-
-    Parameters
-    ----------
-    log_directory : str
-        The system path in which the log should be printed.
-    """    
-    log_file = os.path.join(log_directory, "whitelist.log")
-
-    if not os.path.exists(log_directory):
-        os.makedirs(log_directory)
-
-    file_handler = logging.FileHandler(log_file, mode="a")
-    file_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-    file_handler.setFormatter(file_formatter)
-
-    console_handler = logging.StreamHandler()
-    console_formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-    console_handler.setFormatter(console_formatter)
-
-    logging.basicConfig(level=logging.INFO, handlers=[file_handler, console_handler])
 
 
 def heartbeat(count: int) -> None:
@@ -80,7 +55,7 @@ def heartbeat(count: int) -> None:
         Interval between messages.
     """    
     while True:
-        logging.info("Whitelist is running... Use [Ctrl + C] to stop the application.")
+        logger.info("Whitelist is running... Use [Ctrl + C] to stop the application.")
         time.sleep(count)
 
 
@@ -143,7 +118,7 @@ def is_player_in_database(player_name: str, identity_id: str, db_path: str) -> b
             )
             is_whitelisted = cur.fetchone()
             if is_whitelisted is not None:
-                logging.info(
+                logger.info(
                     "Player %s or IdentityId %s found in database and is whitelisted."
                     % (
                         player_name,
@@ -152,7 +127,7 @@ def is_player_in_database(player_name: str, identity_id: str, db_path: str) -> b
                 )
                 return True
             else:
-                logging.info(
+                logger.info(
                     "Player %s or IdentityId %s not found in database or not whitelisted."
                     % (
                         player_name,
@@ -161,7 +136,7 @@ def is_player_in_database(player_name: str, identity_id: str, db_path: str) -> b
                 )
                 return False
     except sqlite3.Error as database_error:
-        logging.error("Database error: %s" % database_error)
+        logger.error("Database error: %s" % database_error)
         return False
 
 
@@ -193,7 +168,7 @@ def is_player_in_json(player_name: str, identity_id: str, json_path: str) -> boo
                     or identity_id.lower() == player.get("identity_id", "").lower()
                 ):
                     if player.get("whitelisted", 0) == 1:
-                        logging.info(
+                        logger.info(
                             "Player %s or IdentityId %s found in JSON and is whitelisted."
                             % (
                                 player_name,
@@ -201,7 +176,7 @@ def is_player_in_json(player_name: str, identity_id: str, json_path: str) -> boo
                             )
                         )
                         return True
-            logging.info(
+            logger.info(
                 "Player %s or IdentityId %s not found in JSON or not whitelisted."
                 % (
                     player_name,
@@ -210,7 +185,7 @@ def is_player_in_json(player_name: str, identity_id: str, json_path: str) -> boo
             )
             return False
     except json.JSONDecodeError as json_error:
-        logging.error("JSON error: %s" % json_error)
+        logger.error("JSON error: %s" % json_error)
         return False
 
 
@@ -242,11 +217,11 @@ def execute_kick_command(
             with Client(host=rcon_host, port=rcon_port, passwd=rcon_password) as client:
                 rsp = client.run(command=command)
                 client.close()
-            logging.info(
+            logger.info(
                 "Successfully executed kick command for player ID %s" % player_id
             )
         except Exception as e:
-            logging.error(
+            logger.error(
                 "Unexpected error executing kick command for player ID %s: %s"
                 % (player_id, e)
             )
@@ -278,9 +253,9 @@ def tail_log_file(file_path: str, callback: callable) -> None:
                 for line in chunk.splitlines():
                     callback(line)
     except FileNotFoundError:
-        logging.error("Log file not found: %s" % file_path)
+        logger.error("Log file not found: %s" % file_path)
     except Exception:
-        logging.exception("Error reading log file")
+        logger.exception("Error reading log file")
 
 
 def process_log_line(
@@ -317,7 +292,7 @@ def process_log_line(
     if match:
         action, player_id, player_name, identity_id = match.groups()
         player_name = player_name.strip()
-        logging.info(
+        logger.info(
             "%s Player - ID: %s, Name: %s, IdentityId: %s"
             % (
                 action,
@@ -336,11 +311,11 @@ def process_log_line(
                 player_name, identity_id, whitelist_path
             )
         else:
-            logging.error("Unknown whitelist type: %s" % whitelist_type)
+            logger.error("Unknown whitelist type: %s" % whitelist_type)
             return
 
         if not is_whitelisted:
-            logging.warning(
+            logger.warning(
                 "Player: %s with IdentityId: %s is NOT whitelisted! Kicking..."
                 % (
                     player_name,
@@ -349,7 +324,7 @@ def process_log_line(
             )
             execute_kick_command(player_id, rcon_host, rcon_port, rcon_password)
         else:
-            logging.info(
+            logger.info(
                 "Player: %s with IdentityId: %s is whitelisted!"
                 % (
                     player_name,
@@ -357,7 +332,7 @@ def process_log_line(
                 )
             )
     else:
-        logging.debug("Unmatched line: %s" % line)
+        logger.debug("Unmatched line: %s" % line)
 
 
 def initiate(
@@ -413,11 +388,11 @@ def initiate(
                 ),
             )
         else:
-            logging.error("No recent log file found to process.")
+            logger.error("No recent log file found to process.")
     except KeyboardInterrupt:
-        logging.info("Script interrupted by user.")
+        logger.info("Script interrupted by user.")
     except Exception as e:
-        logging.exception("Unexpected error occurred in main process: %s" % e)
+        logger.exception("Unexpected error occurred in main process: %s" % e)
 
 
 def main() -> None:
@@ -521,10 +496,10 @@ def main() -> None:
         whitelist_type = "db"
 
     if args.config:
-        logging.info("Configuration argument provided...")
+        logger.info("Configuration argument provided...")
         Config()
     else:
-        logging.info("Using provided arguments...")
+        logger.info("Using provided arguments...")
         initiate(
             whitelist_type=whitelist_type,
             whitelist_path=args.whitelist_path,
