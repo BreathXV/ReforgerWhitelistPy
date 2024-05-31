@@ -34,18 +34,48 @@ from rcon.battleye import Client
 
 
 class Config:
+    """A class to represent the configuration file and its values.
+
+    ...
+    
+    Attributes
+    ----------
+    config_path : str
+        The path to the configuration file.
+    whitelist_type : str
+        The whitelist type the user chooses (json, db).
+    whitelist_path : str
+        The path to the whitelist data.
+    base_log_dir : str
+        The path to the game's `console.log` file.
+    rcon_host : str
+        The IP address that the RCON is hosted on.
+    rcon_port : int
+        The port the RCON is hosted on.
+    rcon_password : str
+        The password used for connection to the RCON host.
+    heartbeat : int
+        The interval between whitelist status messages.
+
+    Methods
+    ----------
+    check_config:
+        Checks that the provided configuration file has all of the required parameters.
+    get_config_value -> bool:
+        Retrieves all values from the configuration file.
+    """    
     def __init__(
         self,
         config_path: str,
     ) -> bool:
-        self.config_path = config_path,
-        self.whitelist_type = None,
-        self.whitelist_path = None,
-        self.base_log_dir = None,
-        self.rcon_host = None,
-        self.rcon_port = None,
-        self.rcon_password = None,
-        self.heartbeat = None,
+        self.config_path = config_path
+        self.whitelist_type = None
+        self.whitelist_path = None
+        self.base_log_dir = None
+        self.rcon_host = None
+        self.rcon_port = None
+        self.rcon_password = None
+        self.heartbeat = None
         self.param_dict = {
             "env": "",
             "whitelist_type": "",
@@ -54,8 +84,8 @@ class Config:
             "rcon_host": "",
             "rcon_port": "",
             "rcon_password": "",
-            "heartbeat": "",
-        },
+            "heartbeat": ""
+        }
         
     def check_config(self) -> bool:
         """Checks the config file to ensure it befits the applications needs.
@@ -94,8 +124,12 @@ class Config:
 def setup_logging(log_directory: str) -> None:
     """Set up the logging for the application. Will also print to the CLI.
 
-    Args:
-        log_directory (str): The system path in which the log should be printed.
+    ...
+
+    Parameters
+    ----------
+    log_directory : str
+        The system path in which the log should be printed.
     """    
     log_file = os.path.join(log_directory, "whitelist.log")
 
@@ -116,8 +150,12 @@ def setup_logging(log_directory: str) -> None:
 def heartbeat(count: int) -> None:
     """Sends log and CLI messages every count in seconds.
 
-    Args:
-        count (int): Interval between messages.
+    ...
+
+    Parameters
+    ----------
+    count : int
+        Interval between messages.
     """    
     while True:
         logging.info("Whitelist is running... Use [Ctrl + C] to stop the application.")
@@ -125,8 +163,14 @@ def heartbeat(count: int) -> None:
 
 
 def find_latest_log_dir(base_log_dir: str) -> str | None:
-    """
-    Used to find the latest game server log directory.
+    """Used to find the latest game server log directory.
+
+    ...
+
+    Parameters
+    ----------
+    base_log_dir : str
+        The directory where the game's `console.log` file is based.
     """
     dir_pattern = re.compile(r"logs_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}")
     log_dirs = [
@@ -147,13 +191,21 @@ def find_latest_log_dir(base_log_dir: str) -> str | None:
 def is_player_in_database(player_name: str, identity_id: str, db_path: str) -> bool:
     """Checks if a player's identifier is in the database.
 
-    Args:
-        player_name (str): The player's gamertag (Console) or name (PC).
-        identity_id (str): The player's GUID (BID).
-        db_path (str): The system path to the database file.
+    ...
 
-    Returns:
-        bool: Whether the player is in the database (True) or not (False).
+    Parameters
+    ----------
+    player_name : str
+        The player's gamertag (Console) or name (PC).
+    identity_id : str
+        The player's GUID (BID).
+    db_path : str
+        The system path to the database file.
+
+    Returns
+    ----------
+    bool
+        Whether the player is in the database (True) or not (False).
     """
     try:
         with sqlite3.connect(db_path) as conn:
@@ -194,13 +246,21 @@ def is_player_in_database(player_name: str, identity_id: str, db_path: str) -> b
 def is_player_in_json(player_name: str, identity_id: str, json_path: str) -> bool:
     """Checks if the player is in the JSON.
 
-    Args:
-        player_name (str): The player's gamertag (Console) or name (PC).
-        identity_id (str): The player's GUID (BID).
-        json_path (str): The system path to the JSON file.
+    ...
 
-    Returns:
-        bool: Whether the player is in the database (True) or not (False).
+    Parameters
+    ----------
+    player_name : str
+        The player's gamertag (Console) or name (PC).
+    identity_id : str
+        The player's GUID (BID).
+    json_path : str
+        The system path to the JSON file.
+
+    Returns
+    ----------
+    bool
+        Whether the player is in the database (True) or not (False).
     """    
     try:
         with open(json_path, "r", encoding="utf-8") as file:
@@ -235,17 +295,24 @@ def is_player_in_json(player_name: str, identity_id: str, json_path: str) -> boo
 def execute_kick_command(
     player_id: str, rcon_host: str, rcon_port: int, rcon_password: str
 ) -> None:
-    """_summary_
+    """Starts the thread to establish the RCON connection and execute the kick command.
 
-    Args:
-        player_id (str): The ID of the player, typically assigned by the server upon join.
-        rcon_host (str): The host IP address of the RCON.
-        rcon_port (int): The port of the RCON.
-        rcon_password (str): The password of the RCON.
+    ...
+
+    Parameters
+    ----------
+    player_id : str
+        The ID of the player, typically assigned by the server upon join.
+    rcon_host : str
+        The host IP address of the RCON.
+    rcon_port : int
+        The port of the RCON.
+    rcon_password : str
+        The password of the RCON.
     """
 
-    def kick_player():
-        """Establishes a connection with BERCon and executes the kick command.
+    def kick_player() -> None:
+        """Nested function that establishes a connection with BERCon and executes the kick command.
         """
         command = "#kick %s" % player_id
 
@@ -269,9 +336,14 @@ def execute_kick_command(
 def tail_log_file(file_path: str, callback: callable) -> None:
     """Catches the latest line of the game server's console log.
 
-    Args:
-        file_path (str): The system path to the console log.
-        callback (callable): Call to the process log line.
+    ...
+
+    Parameters
+    ----------
+    file_path : str
+        The system path to the console log.
+    callback : callable
+        Call to the process log line.
     """    
     try:
         with open(file_path, "r", encoding="utf-8") as log_file:
@@ -299,14 +371,23 @@ def process_log_line(
 ) -> None:
     """Processes the log line checking for a player update/create event.
 
-    Args:
-        line (str): The line of which to process.
-        whitelist_type (str): The type of whitelist procedure to use for this event.
-        whitelist_path (str): The system path to the whitelist data.
-        rcon_host (str): The host IP address of the RCON.
-        rcon_port (int): The port of the RCON.
-        rcon_password (str): The password of the RCON.
-    """    
+    ...
+
+    Parameters
+    ----------
+        line : str
+            The line of which to process.
+        whitelist_type : str
+            The type of whitelist procedure to use for this event.
+        whitelist_path : str
+            The system path to the whitelist data.
+        rcon_host : str
+            The host IP address of the RCON.
+        rcon_port : int
+            The port of the RCON.
+        rcon_password : str
+            The password of the RCON.
+    """
     match = re.search(
         r"(Creating|Updating) player: PlayerId=(\d+), Name=([^,]+), IdentityId=([a-f0-9-]+)",
         line,
@@ -355,7 +436,7 @@ def process_log_line(
             )
     else:
         logging.debug("Unmatched line: %s" % line)
-        
+
 
 def initiate(
     whitelist_type: str,
@@ -368,14 +449,24 @@ def initiate(
 ) -> None:
     """Initiates the application with the provided arguments.
 
-    Args:
-        whitelist_type (str, optional): Type of whitelist to use (database or json). Defaults to args.whitelist_type.
-        whitelist_path (str, optional): Path to the whitelist file (database or JSON). Defaults to args.whitelist_path.
-        base_log_dir (str, optional): Base directory to look for log files. Defaults to args.base_log_dir.
-        rcon_host (str, optional): RCON host address. Defaults to args.rcon_host.
-        rcon_port (int, optional): RCON port. Defaults to args.rcon_port.
-        rcon_password (str, optional): RCON password. Defaults to args.rcon_password.
-        heartbeat (int, optional): Interval in seconds when the application should log it's alive. Defaults to args.heartbeat.
+    ...
+
+    Parameters
+    ----------
+        whitelist_type : str
+            Type of whitelist to use (database or json).
+        whitelist_path : str
+            Path to the whitelist file (database or JSON).
+        base_log_dir : str
+            Base directory to look for log files.
+        rcon_host : str
+            RCON host address.
+        rcon_port : int
+            RCON port.
+        rcon_password : str
+            RCON password.
+        heartbeat : int
+            Interval in seconds when the application should log it's alive.
     """
 
     heartbeat_thread = threading.Thread(
