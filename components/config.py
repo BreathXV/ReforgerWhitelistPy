@@ -1,5 +1,5 @@
 import json
-from components.logging import setup_logging
+import loggi
 
 class Config:
     """A class to represent the configuration file and its values.
