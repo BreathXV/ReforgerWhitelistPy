@@ -98,7 +98,7 @@ class Config:
                 for param in config.get(str(self.param_dict.keys()), ""):
                     if not param:
                         logging.error("A parameter is missing in the configuration file!")
-                        return
+                        return False
                     else:
                         logging.info(f"All parameters are present within {self.config_path}")
                         return True
