@@ -6,8 +6,6 @@ logger = logging.getLogger(__name__)
 class Config:
     """A class to represent the configuration file and its values.
 
-    ...
-    
     Attributes
     ----------
     config_path : str
@@ -34,10 +32,7 @@ class Config:
     get_config_value -> bool:
         Retrieves all values from the configuration file.
     """    
-    def __init__(
-        self,
-        config_path: str,
-    ) -> bool:
+    def __init__(self, config_path: str):
         self.config_path = config_path
         self.whitelist_type = None
         self.whitelist_path = None
@@ -47,7 +42,6 @@ class Config:
         self.rcon_password = None
         self.heartbeat = None
         self.param_dict = {
-            "env": "",
             "whitelist_type": "",
             "whitelist_path": "",
             "base_log_dir": "",
@@ -57,11 +51,8 @@ class Config:
             "heartbeat": ""
         }
 
-
     def check_config(self) -> bool:
-        """Checks the config file to ensure it befits the applications needs.
-
-        ...
+        """Checks the config file to ensure it meets the application's needs.
 
         Returns
         ----------
@@ -73,34 +64,43 @@ class Config:
                 config = json.load(file)
                 logger.info("Loaded configuration file")
                 # Check for all params in the config
-                for param in config.get(str(self.param_dict.keys()), ""):
-                    if not param:
-                        logger.error("A parameter is missing in the configuration file!")
+                for param in self.param_dict.keys():
+                    if param not in config:
+                        logger.error(f"A parameter '{param}' is missing in the configuration file!")
                         return False
-                    else:
-                        logger.info(f"All parameters are present within {self.config_path}")
-                        return True
+                logger.info(f"All parameters are present within {self.config_path}")
+                return True
         except FileNotFoundError:
             logger.error(f"Configuration file could not be found at {self.config_path}")
+            return False
         except json.JSONDecodeError:
             logger.error(f"File was found but could not decode it - make sure it has 'utf-8' encoding.")
+            return False
     
     def get_config_value(self) -> bool:
         """Retrieves all values from the config file.
 
-        ...
-
         Returns
         ----------
         bool
-            Whether all of the configuration file's values where able to be assigned.
+            Whether all of the configuration file's values were able to be assigned.
         """        
-        with open(file=self.config_path, mode="r", encoding="utf-8") as file:
-            config = json.load(file)
-            # Assign each args value to the dict
-            logger.info("Assigning all config values...")
-            for param in self.param_dict.keys():
-                logger.info(f"Loaded {param}")
-                self.param_dict[param] == config.get(param, "")
-                logger.info(f"{param}: {self.param_dict[param]}")
-            return True
+        try:
+            with open(file=self.config_path, mode="r", encoding="utf-8") as file:
+                config = json.load(file)
+                # Assign each config value to the corresponding class attribute
+                logger.info("Assigning all config values...")
+                for param in self.param_dict.keys():
+                    if param in config:
+                        setattr(self, param, config[param])
+                        logger.info(f"{param}: {getattr(self, param)}")
+                    else:
+                        logger.error(f"Parameter '{param}' is missing in the configuration file!")
+                        return False
+                return True
+        except FileNotFoundError:
+            logger.error(f"Configuration file could not be found at {self.config_path}")
+            return False
+        except json.JSONDecodeError:
+            logger.error(f"File was found but could not decode it - make sure it has 'utf-8' encoding.")
+            return False
