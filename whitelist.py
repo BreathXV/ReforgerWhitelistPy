@@ -35,11 +35,12 @@ import os
 import datetime
 import threading
 import logging
-import logging.handlers
 
 from rcon.battleye import Client
 
 from components.logging import setup_logging
+
+logger = logging.getLogger(__name__)
 
 
 def setup_logging(log_directory: str) -> None:
