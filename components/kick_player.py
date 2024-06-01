@@ -27,11 +27,12 @@ def execute_kick_command(
     def kick_player() -> None:
         """Nested function that establishes a connection with BERCon and executes the kick command.
         """
-        command = "#kick %s" % player_id
+        command = f"#kick {player_id}"
 
         try:
             with Client(host=rcon_host, port=rcon_port, passwd=rcon_password) as client:
                 rsp = client.run(command=command)
+                # TODO: Read rsp and determine whether successful or not.
                 client.close()
             logger.info(
                 "Successfully executed kick command for player ID %s" % player_id
