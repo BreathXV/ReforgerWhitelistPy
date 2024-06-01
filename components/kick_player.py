@@ -5,6 +5,7 @@ from rcon.battleye import Client
 
 logger = logging.getLogger(__name__)
 
+
 def execute_kick_command(
     player_id: str, rcon_host: str, rcon_port: int, rcon_password: str
 ) -> None:
@@ -25,8 +26,7 @@ def execute_kick_command(
     """
 
     def kick_player() -> None:
-        """Nested function that establishes a connection with BERCon and executes the kick command.
-        """
+        """Nested function that establishes a connection with BERCon and executes the kick command."""
         command = f"#kick {player_id}"
 
         try:

@@ -1,5 +1,6 @@
 import logging, logging.handlers
-import os   # TODO: Change to pathlib
+import os  # TODO: Change to pathlib
+
 
 def setup_logging(log_directory: str) -> None:
     """Set up the logging for the application. Will also print to the CLI.
@@ -10,7 +11,7 @@ def setup_logging(log_directory: str) -> None:
     ----------
     log_directory : str
         The system path in which the log should be printed.
-    """    
+    """
     log_file = os.path.join(log_directory, "whitelist.log")
 
     if not os.path.exists(log_directory):

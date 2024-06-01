@@ -5,6 +5,7 @@ from components.process_logs import find_latest_log_dir, tail_log_file, process_
 
 logger = logging.getLogger(__name__)
 
+
 def initiate(
     whitelist_type: str,
     whitelist_path: str,

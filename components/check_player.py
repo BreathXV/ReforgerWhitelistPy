@@ -4,6 +4,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 def is_player_in_database(player_name: str, identity_id: str, db_path: str) -> bool:
     """Checks if a player's identifier is in the database.
 
@@ -69,7 +70,7 @@ def is_player_in_json(player_name: str, identity_id: str, json_path: str) -> boo
     ----------
     bool
         Whether the player is in the database (True) or not (False).
-    """    
+    """
     try:
         with open(json_path, "r", encoding="utf-8") as file:
             data = json.load(file)

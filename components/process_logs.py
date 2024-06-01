@@ -9,6 +9,7 @@ from components.kick_player import execute_kick_command
 
 logger = logging.getLogger(__name__)
 
+
 def tail_log_file(file_path: str, callback: callable) -> None:
     """Catches the latest line of the game server's console log.
 
@@ -20,7 +21,7 @@ def tail_log_file(file_path: str, callback: callable) -> None:
         The system path to the console log.
     callback : callable
         Call to the process log line.
-    """    
+    """
     try:
         with open(file_path, "r", encoding="utf-8") as log_file:
             log_file.seek(0, 2)
@@ -86,9 +87,7 @@ def process_log_line(
                 player_name, identity_id, whitelist_path
             )
         elif whitelist_type == "json":
-            is_whitelisted = is_player_in_json(
-                player_name, identity_id, whitelist_path
-            )
+            is_whitelisted = is_player_in_json(player_name, identity_id, whitelist_path)
         else:
             logger.error("Unknown whitelist type: %s" % whitelist_type)
             return

@@ -3,6 +3,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class Config:
     """A class to represent the configuration file and its values.
 
@@ -31,7 +32,8 @@ class Config:
         Checks that the provided configuration file has all of the required parameters.
     get_config_value -> bool:
         Retrieves all values from the configuration file.
-    """    
+    """
+
     def __init__(self, config_path: str):
         self.config_path = config_path
         self.whitelist_type = None
@@ -48,7 +50,7 @@ class Config:
             "rcon_host": "",
             "rcon_port": "",
             "rcon_password": "",
-            "heartbeat": ""
+            "heartbeat": "",
         }
 
     def check_config(self) -> bool:
@@ -66,7 +68,9 @@ class Config:
                 # Check for all params in the config
                 for param in self.param_dict.keys():
                     if param not in config:
-                        logger.error(f"A parameter '{param}' is missing in the configuration file!")
+                        logger.error(
+                            f"A parameter '{param}' is missing in the configuration file!"
+                        )
                         return False
                 logger.info(f"All parameters are present within {self.config_path}")
                 return True
@@ -74,9 +78,11 @@ class Config:
             logger.error(f"Configuration file could not be found at {self.config_path}")
             return False
         except json.JSONDecodeError:
-            logger.error(f"File was found but could not decode it - make sure it has 'utf-8' encoding.")
+            logger.error(
+                f"File was found but could not decode it - make sure it has 'utf-8' encoding."
+            )
             return False
-    
+
     def get_config_value(self) -> bool:
         """Retrieves all values from the config file.
 
@@ -84,7 +90,7 @@ class Config:
         ----------
         bool
             Whether all of the configuration file's values were able to be assigned.
-        """        
+        """
         try:
             with open(file=self.config_path, mode="r", encoding="utf-8") as file:
                 config = json.load(file)
@@ -95,12 +101,16 @@ class Config:
                         setattr(self, param, config[param])
                         logger.info(f"{param}: {getattr(self, param)}")
                     else:
-                        logger.error(f"Parameter '{param}' is missing in the configuration file!")
+                        logger.error(
+                            f"Parameter '{param}' is missing in the configuration file!"
+                        )
                         return False
                 return True
         except FileNotFoundError:
             logger.error(f"Configuration file could not be found at {self.config_path}")
             return False
         except json.JSONDecodeError:
-            logger.error(f"File was found but could not decode it - make sure it has 'utf-8' encoding.")
+            logger.error(
+                f"File was found but could not decode it - make sure it has 'utf-8' encoding."
+            )
             return False
