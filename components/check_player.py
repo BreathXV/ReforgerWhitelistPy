@@ -38,24 +38,16 @@ def is_player_in_database(player_name: str, identity_id: str, db_path: str) -> b
             is_whitelisted = cur.fetchone()
             if is_whitelisted is not None:
                 logger.info(
-                    "Player %s or IdentityId %s found in database and is whitelisted."
-                    % (
-                        player_name,
-                        identity_id,
-                    )
+                    f"Player {player_name} or IdentityId {identity_id} found in database and is whitelisted."
                 )
                 return True
             else:
                 logger.info(
-                    "Player %s or IdentityId %s not found in database or not whitelisted."
-                    % (
-                        player_name,
-                        identity_id,
-                    )
+                    f"Player {player_name} or IdentityId {identity_id} not found in database or not whitelisted."
                 )
                 return False
     except sqlite3.Error as database_error:
-        logger.error("Database error: %s" % database_error)
+        logger.error(f"Database error: {database_error}")
         return False
 
 
@@ -88,21 +80,13 @@ def is_player_in_json(player_name: str, identity_id: str, json_path: str) -> boo
                 ):
                     if player.get("whitelisted", 0) == 1:
                         logger.info(
-                            "Player %s or IdentityId %s found in JSON and is whitelisted."
-                            % (
-                                player_name,
-                                identity_id,
-                            )
+                            f"Player {player_name} or IdentityId {identity_id} found in JSON and is whitelisted."
                         )
                         return True
             logger.info(
-                "Player %s or IdentityId %s not found in JSON or not whitelisted."
-                % (
-                    player_name,
-                    identity_id,
-                )
+                f"Player {player_name} or IdentityId {identity_id} not found in JSON or not whitelisted."
             )
             return False
     except json.JSONDecodeError as json_error:
-        logger.error("JSON error: %s" % json_error)
+        logger.error(f"JSON error: {json_error}")
         return False
