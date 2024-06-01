@@ -62,4 +62,4 @@ def initiate(
     except KeyboardInterrupt:
         logger.info("Script interrupted by user.")
     except Exception as e:
-        logger.exception("Unexpected error occurred in main process: %s" % e)
+        logger.exception(f"Unexpected error occurred in main process: {e}")
