@@ -101,19 +101,39 @@ def main() -> None:
     )
 
     args = parser.parse_args()
-    
+
     if args.json:
-        whitelist_type = "json"
+        converted_whitelist_type = "json"
     elif args.db:
-        whitelist_type = "db"
+        converted_whitelist_type = "db"
 
     if args.config:
-        logger.info("Configuration argument provided...")
-        Config()
-    else:
-        logger.info("Using provided arguments...")
+        config = Config(args.config)
+        paramsPresent = config.check_config
+        paramsAssigned = config.get_config_value
+        fatalMsg = "Please check your configuration file and restart the application again."
+
+        if not paramsPresent:
+            logging.fatal(fatalMsg)
+            return
+        if not paramsAssigned:
+            logging.fatal(fatalMsg)
+            return
+        
+        logger.info("Using configuration file provided...")
         initiate(
-            whitelist_type=whitelist_type,
+            whitelist_type=config.whitelist_type,
+            whitelist_path=config.whitelist_path,
+            base_log_dir=config.base_log_dir,
+            rcon_host=config.rcon_host,
+            rcon_port=config.rcon_port,
+            rcon_password=config.rcon_password,
+            heartbeat=config.heartbeat
+        )
+    else:
+        logger.info("Using provided command-line arguments...")
+        initiate(
+            whitelist_type=converted_whitelist_type,
             whitelist_path=args.whitelist_path,
             base_log_dir=args.base_log_dir,
             rcon_host=args.rcon_host,
