@@ -7,9 +7,9 @@ from components.initiate import initiate
 
 logger = logging.getLogger(__name__)
 
+
 def main() -> None:
-    """Used to invoke the initiate function. Parses any arguments provided by the user.
-    """    
+    """Used to invoke the initiate function. Parses any arguments provided by the user."""
     parser = argparse.ArgumentParser(
         prog="Reforger Whitelist",
         description="""
@@ -111,7 +111,9 @@ def main() -> None:
         config = Config(args.config)
         paramsPresent = config.check_config
         paramsAssigned = config.get_config_value
-        fatalMsg = "Please check your configuration file and restart the application again."
+        fatalMsg = (
+            "Please check your configuration file and restart the application again."
+        )
 
         if not paramsPresent:
             logging.fatal(fatalMsg)
@@ -119,7 +121,7 @@ def main() -> None:
         if not paramsAssigned:
             logging.fatal(fatalMsg)
             return
-        
+
         logger.info("Using configuration file provided...")
         initiate(
             whitelist_type=config.whitelist_type,
@@ -128,7 +130,7 @@ def main() -> None:
             rcon_host=config.rcon_host,
             rcon_port=config.rcon_port,
             rcon_password=config.rcon_password,
-            heartbeat=config.heartbeat
+            heartbeat=config.heartbeat,
         )
     else:
         logger.info("Using provided command-line arguments...")
@@ -139,7 +141,7 @@ def main() -> None:
             rcon_host=args.rcon_host,
             rcon_port=args.rcon_port,
             rcon_password=args.rcon_password,
-            heartbeat=args.heartbeat
+            heartbeat=args.heartbeat,
         )
 
 
