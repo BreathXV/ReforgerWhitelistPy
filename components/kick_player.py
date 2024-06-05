@@ -32,7 +32,15 @@ def execute_kick_command(
         try:
             with Client(host=rcon_host, port=rcon_port, passwd=rcon_password) as client:
                 rsp = client.run(command=command)
-                # TODO: Read rsp and determine whether successful or not.
+                if rsp == "":
+                    logger.error(f"Failed to execute kick command for player ID {player_id}")
+                    logger.debug(
+                        f"""
+                        Response: {rsp} | Command: {command} | 
+                        Host: {rcon_host} | Port: {rcon_port} | Password: {rcon_password}
+                        """
+                    )
+                # TODO: Add additional error handling for other rsp
                 client.close()
             logger.info(
                 "Successfully executed kick command for player ID %s" % player_id
