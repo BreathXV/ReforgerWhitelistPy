@@ -44,7 +44,7 @@ jobs:
           name: ReforgerWhitelistLatest
           path: dist/ReforgerWhitelist-Latest.exe
           if-no-files-found: error
-  
+    
   pre-release:
     needs: build
     name: "Pre Release"
