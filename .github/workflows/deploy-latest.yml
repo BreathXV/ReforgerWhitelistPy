@@ -40,3 +40,27 @@ jobs:
           name: ReforgerWhitelistLatest
           path: dist/ReforgerWhitelist-Latest.exe
           if-no-files-found: error
+
+  pre-release:
+    name: "Pre Release"
+    runs-on: "ubuntu-latest"
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: ReforgerWhitelistLatest
+          path: dist/ReforgerWhitelist-Latest.exe
+
+      - name: "Build & test"
+        run: |
+          echo "done!"
+
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "Development Build"
+          files: |
+            dist/ReforgerWhitelist-Latest.exe
