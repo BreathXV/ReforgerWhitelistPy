@@ -42,6 +42,7 @@ jobs:
           if-no-files-found: error
 
   pre-release:
+    needs: build
     name: "Pre Release"
     runs-on: "ubuntu-latest"
 
