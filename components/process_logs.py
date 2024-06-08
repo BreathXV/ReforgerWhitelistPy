@@ -6,6 +6,7 @@ import logging
 
 from components.check_player import is_player_in_json, is_player_in_database
 from components.kick_player import execute_kick_command
+from components import logging as dev
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +26,7 @@ def tail_log_file(file_path: str, callback: callable) -> None:
     try:
         with open(file_path, "r", encoding="utf-8") as log_file:
             log_file.seek(0, 2)
+            dev.debugLine("Found file, seeking last two lines...")
             while True:
                 chunk = log_file.read(1024)
                 if not chunk:
@@ -33,7 +35,7 @@ def tail_log_file(file_path: str, callback: callable) -> None:
                 for line in chunk.splitlines():
                     callback(line)
     except FileNotFoundError:
-        logger.error("Log file not found: %s" % file_path)
+        logger.error(f"Log file not found: {file_path}")
     except Exception:
         logger.exception("Error reading log file")
 
@@ -73,13 +75,12 @@ def process_log_line(
         action, player_id, player_name, identity_id = match.groups()
         player_name = player_name.strip()
         logger.info(
-            "%s Player - ID: %s, Name: %s, IdentityId: %s"
-            % (
-                action,
-                player_id,
-                player_name,
-                identity_id,
-            )
+            f"""
+            {action} 
+            Player - ID: {player_id}, 
+            Name: {player_name}, 
+            IdentityId: {identity_id}
+            """
         )
 
         if whitelist_type == "database":
@@ -89,28 +90,23 @@ def process_log_line(
         elif whitelist_type == "json":
             is_whitelisted = is_player_in_json(player_name, identity_id, whitelist_path)
         else:
-            logger.error("Unknown whitelist type: %s" % whitelist_type)
+            logger.error(f"Unknown whitelist type: {whitelist_type}")
             return
 
         if not is_whitelisted:
             logger.warning(
-                "Player: %s with IdentityId: %s is NOT whitelisted! Kicking..."
-                % (
-                    player_name,
-                    identity_id,
-                )
+                f"""
+                Player: {player_name} with IdentityId: {identity_id} is NOT whitelisted! Kicking...
+                """
             )
+            dev.debugLine("Executing kick command shortly!")
             execute_kick_command(player_id, rcon_host, rcon_port, rcon_password)
         else:
             logger.info(
-                "Player: %s with IdentityId: %s is whitelisted!"
-                % (
-                    player_name,
-                    identity_id,
-                )
+                f"Player: {player_name} with IdentityId: {identity_id} is whitelisted!"
             )
     else:
-        logger.debug("Unmatched line: %s" % line)
+        dev.debugLine(f"Unmatched line: {line}")
 
 
 def find_latest_log_dir(base_log_dir: str) -> str | None:
@@ -124,6 +120,7 @@ def find_latest_log_dir(base_log_dir: str) -> str | None:
         The directory where the game's `console.log` file is based.
     """
     dir_pattern = re.compile(r"logs_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}")
+    dev.debugLine("Compiled regex pattern.")
     log_dirs = [
         d
         for d in os.listdir(base_log_dir)
@@ -131,6 +128,7 @@ def find_latest_log_dir(base_log_dir: str) -> str | None:
     ]
 
     if not log_dirs:
+        dev.debugLine("Could not find console log directory.")
         return None
 
     latest_log_dir = max(

@@ -1,5 +1,8 @@
 import json
 import logging
+import sys
+
+from components import logging as dev
 
 logger = logging.getLogger(__name__)
 
@@ -67,6 +70,7 @@ class Config:
                 logger.info("Loaded configuration file")
                 # Check for all params in the config
                 for param in self.param_dict.keys():
+                    dev.debugLine("Checking params in dictionary at line")
                     if param not in config:
                         logger.error(
                             f"A parameter '{param}' is missing in the configuration file!"
@@ -77,10 +81,11 @@ class Config:
         except FileNotFoundError:
             logger.error(f"Configuration file could not be found at {self.config_path}")
             return False
-        except json.JSONDecodeError:
+        except json.JSONDecodeError as e:
             logger.error(
                 f"File was found but could not decode it - make sure it has 'utf-8' encoding."
             )
+            dev.debugLine(e.msg)
             return False
 
     def get_config_value(self) -> bool:
@@ -97,6 +102,7 @@ class Config:
                 # Assign each config value to the corresponding class attribute
                 logger.info("Assigning all config values...")
                 for param in self.param_dict.keys():
+                    dev.debugLine("Assigning parameters to class attributes.")
                     if param in config:
                         setattr(self, param, config[param])
                         logger.info(f"{param}: {getattr(self, param)}")
@@ -109,8 +115,9 @@ class Config:
         except FileNotFoundError:
             logger.error(f"Configuration file could not be found at {self.config_path}")
             return False
-        except json.JSONDecodeError:
+        except json.JSONDecodeError as e:
             logger.error(
                 f"File was found but could not decode it - make sure it has 'utf-8' encoding."
             )
+            dev.debugLine(e.msg)
             return False

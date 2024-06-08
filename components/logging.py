@@ -1,5 +1,8 @@
 import logging, logging.handlers
 import os  # TODO: Change to pathlib
+import sys
+
+logger = logging.getLogger(__name__)
 
 
 def setup_logging(log_directory: str) -> None:
@@ -26,3 +29,6 @@ def setup_logging(log_directory: str) -> None:
     console_handler.setFormatter(console_formatter)
 
     logging.basicConfig(level=logging.INFO, handlers=[file_handler, console_handler])
+
+def debugLine(msg: str) -> None:
+    logger.debug(f"Debug: {msg}: @{sys._getframe().f_back.f_lineno}")

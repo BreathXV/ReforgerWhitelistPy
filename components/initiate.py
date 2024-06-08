@@ -2,6 +2,7 @@ import threading
 import logging
 
 from components.process_logs import find_latest_log_dir, tail_log_file, process_log_line
+from components import logging as dev
 
 logger = logging.getLogger(__name__)
 
@@ -40,13 +41,18 @@ def initiate(
     heartbeat_thread = threading.Thread(
         target=heartbeat(heartbeat), name="HeartbeatThread"
     )
+    dev.debugLine("Created heartbeat thread.")
     heartbeat_thread.daemon = True
+    dev.debugLine("Added thread to daemon.")
     heartbeat_thread.start()
+    dev.debugLine("Started heartbeat thread.")
 
     latest_console_log_path = find_latest_log_dir(base_log_dir)
+    dev.debugLine("Console directory log path assigned.")
 
     try:
         if latest_console_log_path:
+            dev.debugLine("Starting log processing on console log path...")
             tail_log_file(
                 latest_console_log_path,
                 lambda line: process_log_line(
@@ -60,6 +66,7 @@ def initiate(
             )
         else:
             logger.error("No recent log file found to process.")
+            dev.debugLine(f"Console Log Path: {latest_console_log_path}")
     except KeyboardInterrupt:
         logger.info("Script interrupted by user.")
     except Exception as e:
