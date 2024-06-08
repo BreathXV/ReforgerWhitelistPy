@@ -26,6 +26,7 @@ def tail_log_file(file_path: str, callback: callable) -> None:
     try:
         with open(file_path, "r", encoding="utf-8") as log_file:
             log_file.seek(0, 2)
+            dev.debugLine("Found file, seeking last two lines...")
             while True:
                 chunk = log_file.read(1024)
                 if not chunk:
@@ -101,6 +102,7 @@ def process_log_line(
                     identity_id,
                 )
             )
+            dev.debugLine("Executing kick command shortly!")
             execute_kick_command(player_id, rcon_host, rcon_port, rcon_password)
         else:
             logger.info(
@@ -111,7 +113,7 @@ def process_log_line(
                 )
             )
     else:
-        logger.debug("Unmatched line: %s" % line)
+        dev.debugLine("Unmatched line: %s" % line)
 
 
 def find_latest_log_dir(base_log_dir: str) -> str | None:
@@ -125,6 +127,7 @@ def find_latest_log_dir(base_log_dir: str) -> str | None:
         The directory where the game's `console.log` file is based.
     """
     dir_pattern = re.compile(r"logs_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}")
+    dev.debugLine("Compiled regex pattern.")
     log_dirs = [
         d
         for d in os.listdir(base_log_dir)
@@ -132,6 +135,7 @@ def find_latest_log_dir(base_log_dir: str) -> str | None:
     ]
 
     if not log_dirs:
+        dev.debugLine("Could not find console log directory.")
         return None
 
     latest_log_dir = max(
