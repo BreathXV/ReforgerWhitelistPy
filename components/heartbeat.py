@@ -19,3 +19,4 @@ def heartbeat(count: int) -> None:
     while True:
         logger.info("Whitelist is running... Use [Ctrl + C] to stop the application.")
         time.sleep(count)
+        dev.debugLine(f"Sleep set to: {str(count)}")
