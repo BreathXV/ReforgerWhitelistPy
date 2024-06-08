@@ -1,5 +1,8 @@
 import json
 import logging
+import sys
+
+from components import logging as dev
 
 logger = logging.getLogger(__name__)
 
@@ -67,6 +70,9 @@ class Config:
                 logger.info("Loaded configuration file")
                 # Check for all params in the config
                 for param in self.param_dict.keys():
+                    logger.debug(
+                        f"Checking params in dictionary at line: {sys._getframe().f_back.f_lineno}"
+                    )
                     if param not in config:
                         logger.error(
                             f"A parameter '{param}' is missing in the configuration file!"

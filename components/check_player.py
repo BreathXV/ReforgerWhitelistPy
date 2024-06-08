@@ -2,6 +2,8 @@ import sqlite3
 import json
 import logging
 
+from components import logging as dev
+
 logger = logging.getLogger(__name__)
 
 

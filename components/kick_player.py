@@ -3,6 +3,8 @@ import logging
 
 from rcon.battleye import Client
 
+from components import logging as dev
+
 logger = logging.getLogger(__name__)
 
 
