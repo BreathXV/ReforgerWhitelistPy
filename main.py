@@ -4,6 +4,7 @@ import logging
 from components.logging import setup_logging
 from components.config import Config
 from components.initiate import initiate
+from components import logging as dev
 
 logger = logging.getLogger(__name__)
 
@@ -18,6 +19,7 @@ def main() -> None:
                     https://github.com/BreathXV/ReforgerWhitelistPy
                     """,
     )
+    dev.debugLine("Added argument parser.")
     parser.add_argument(
         "--cfg",
         "--config",
@@ -26,6 +28,7 @@ def main() -> None:
         help="Start from a config.json",
         dest="config",
     )
+    dev.debugLine("Added config argument to parser.")
     # parser.add_argument(
     #     "--wt",
     #     "--whitelist-type",
@@ -42,6 +45,7 @@ def main() -> None:
         help="Use JSON for whitelist queries.",
         dest="json",
     )
+    dev.debugLine("Added json argument to parser.")
     parser.add_argument(
         "--db",
         "--database",
@@ -50,6 +54,7 @@ def main() -> None:
         help="Use a database for whitelist queries.",
         dest="db",
     )
+    dev.debugLine("Added database argument to parser.")
     parser.add_argument(
         "--wp",
         "--whitelist-path",
@@ -58,6 +63,7 @@ def main() -> None:
         help="Path to the whitelist file (database or JSON).",
         dest="whitelist_path",
     )
+    dev.debugLine("Added whitelist path argument to parser.")
     parser.add_argument(
         "--bl",
         "--base-log-dir",
@@ -66,6 +72,7 @@ def main() -> None:
         help="Base directory to look for log files.",
         dest="base_log_dir",
     )
+    dev.debugLine("Added base log directory argument to parser.")
     parser.add_argument(
         "--rh",
         "--rcon-host",
@@ -74,6 +81,7 @@ def main() -> None:
         help="RCON host address.",
         dest="rcon_host",
     )
+    dev.debugLine("Added rcon host argument to parser.")
     parser.add_argument(
         "--rp",
         "--rcon-port",
@@ -82,6 +90,7 @@ def main() -> None:
         help="RCON port number.",
         dest="rcon_port",
     )
+    dev.debugLine("Added rcon port argument to parser.")
     parser.add_argument(
         "--rpw",
         "--rcon-password",
@@ -90,6 +99,7 @@ def main() -> None:
         help="RCON password.",
         dest="rcon_password",
     )
+    dev.debugLine("Added rcon password argument to parser.")
     parser.add_argument(
         "--hb",
         "--heartbeat",
@@ -99,8 +109,10 @@ def main() -> None:
         help="Interval in seconds when the application should log it's alive.",
         dest="heartbeat",
     )
+    dev.debugLine("Added heartbeat argument to parser.")
 
     args = parser.parse_args()
+    dev.debugLine("Parsing all arguments.")
 
     if args.json:
         converted_whitelist_type = "json"
