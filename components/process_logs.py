@@ -35,7 +35,7 @@ def tail_log_file(file_path: str, callback: callable) -> None:
                 for line in chunk.splitlines():
                     callback(line)
     except FileNotFoundError:
-        logger.error("Log file not found: %s" % file_path)
+        logger.error(f"Log file not found: {file_path}")
     except Exception:
         logger.exception("Error reading log file")
 
@@ -75,13 +75,12 @@ def process_log_line(
         action, player_id, player_name, identity_id = match.groups()
         player_name = player_name.strip()
         logger.info(
-            "%s Player - ID: %s, Name: %s, IdentityId: %s"
-            % (
-                action,
-                player_id,
-                player_name,
-                identity_id,
-            )
+            f"""
+            {action} 
+            Player - ID: {player_id}, 
+            Name: {player_name}, 
+            IdentityId: {identity_id}
+            """
         )
 
         if whitelist_type == "database":
@@ -91,29 +90,23 @@ def process_log_line(
         elif whitelist_type == "json":
             is_whitelisted = is_player_in_json(player_name, identity_id, whitelist_path)
         else:
-            logger.error("Unknown whitelist type: %s" % whitelist_type)
+            logger.error(f"Unknown whitelist type: {whitelist_type}")
             return
 
         if not is_whitelisted:
             logger.warning(
-                "Player: %s with IdentityId: %s is NOT whitelisted! Kicking..."
-                % (
-                    player_name,
-                    identity_id,
-                )
+                f"""
+                Player: {player_name} with IdentityId: {identity_id} is NOT whitelisted! Kicking...
+                """
             )
             dev.debugLine("Executing kick command shortly!")
             execute_kick_command(player_id, rcon_host, rcon_port, rcon_password)
         else:
             logger.info(
-                "Player: %s with IdentityId: %s is whitelisted!"
-                % (
-                    player_name,
-                    identity_id,
-                )
+                f"Player: {player_name} with IdentityId: {identity_id} is whitelisted!"
             )
     else:
-        dev.debugLine("Unmatched line: %s" % line)
+        dev.debugLine(f"Unmatched line: {line}")
 
 
 def find_latest_log_dir(base_log_dir: str) -> str | None:
