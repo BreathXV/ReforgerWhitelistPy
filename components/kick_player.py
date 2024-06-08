@@ -49,12 +49,11 @@ def execute_kick_command(
                 # TODO: Add additional error handling for other rsp
                 client.close()
             logger.info(
-                "Successfully executed kick command for player ID %s" % player_id
+                f"Successfully executed kick command for player ID {player_id}"
             )
         except Exception as e:
             logger.error(
-                "Unexpected error executing kick command for player ID %s: %s"
-                % (player_id, e)
+                f"Unexpected error executing kick command for player ID {player_id}: {e}"
             )
 
     kick_thread = threading.Thread(target=kick_player, name=f"KickThread-{player_id}")
