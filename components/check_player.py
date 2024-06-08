@@ -27,6 +27,7 @@ def is_player_in_database(player_name: str, identity_id: str, db_path: str) -> b
     try:
         with sqlite3.connect(db_path) as conn:
             cur = conn.cursor()
+            logger.debug("Established connection with database.")
             cur.execute(
                 """
                 SELECT whitelisted 
@@ -37,6 +38,7 @@ def is_player_in_database(player_name: str, identity_id: str, db_path: str) -> b
                 (player_name, identity_id),
             )
             is_whitelisted = cur.fetchone()
+            logger.debug("Fetched whitelist data for user from database.")
             if is_whitelisted is not None:
                 logger.info(
                     f"Player {player_name} or IdentityId {identity_id} found in database and is whitelisted."
@@ -74,6 +76,7 @@ def is_player_in_json(player_name: str, identity_id: str, json_path: str) -> boo
     try:
         with open(json_path, "r", encoding="utf-8") as file:
             data = json.load(file)
+            logger.debug("Loaded JSON.")
             for player in data.get("players", []):
                 if (
                     player_name.lower() == player.get("game_name", "").lower()
